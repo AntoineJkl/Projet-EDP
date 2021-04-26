@@ -1,8 +1,8 @@
-filename = "sum" #change file name corresponding to the .svg profil wanted
+filename = "wing_blackbird" #change file name corresponding to the .svg profil wanted
 
 # Modules import
 import svgpathtools
-import xml.dom.minidom  
+import xml.dom.minidom
 import gmsh
 import sys
 import os
@@ -12,8 +12,8 @@ from convertmesh import convert2D
 gmsh.initialize(sys.argv)
 model = gmsh.model
 model.add(filename)
-h_border = .1    # Mesh size of the border
-h_curve = .1   # Mesh size of the curve
+h_border = .2    # Mesh size of the border
+h_curve = .2  # Mesh size of the curve
 
 # ------------------------------- BORDER BUILD 
 xlim = [-2, 6]

@@ -1,6 +1,0 @@
-mesh Th = readmesh("mesh/wing_propeller.mesh");
-plot(Th,wait=1);
-
-mesh Th2 = readmesh("mesh/wing_ULM.mesh");
-
-plot(Th2,wait=1,nbiso=30,value=1);

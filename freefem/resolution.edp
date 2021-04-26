@@ -1,4 +1,4 @@
-mesh Th = readmesh("codes/mesh/cylinder2.mesh");
+mesh Th = readmesh("mesh/cylinder1.mesh");
 plot(Th);
 
 //Les espaces:
@@ -12,7 +12,6 @@ Sh p , q ;
 //Conditions:
 func uDx = 2;
 func uDy = 0;
-
 
 //Paramètres
     //Vitesse
@@ -40,17 +39,17 @@ varf aG([ux,uy,p],[wx,wy,q])
     + int2d(Th) ( 2*mu*eps(wx,wy)'*eps(ux,uy) )
     + int2d(Th) ( q*div(ux,uy) )
     //warning
-    - int1d(Th,1,4,3) ( sigmaN(ux,uy,p)'*[wx,wy] )
+    - int1d(Th,1) ( sigmaN(ux,uy,p)'*[wx,wy] )
 ;
 
 varf aN([ux,uy,p],[wx,wy,q]) 
-    = int1d(Th,1,4,3) ( sigmaN(wx,wy,q)'*[ux,uy] )
-    + int1d(Th,1,4,3) ( alphatilde*(wx*ux+wy*uy)/h );
+    = int1d(Th,1) ( sigmaN(wx,wy,q)'*[ux,uy] )
+    + int1d(Th,1) ( alphatilde*(wx*ux+wy*uy)/h );
 
 varf lN([ux,uy,p],[wx,wy,q]) 
     //warning
-    = - int1d(Th,1,4,3) ( sigmaN(wx,wy,q)'*[uDx,uDy] )
-    - int1d(Th,1,4,3) ( alphatilde*(wx*uDx+wy*uDy)/h ) ;
+    = - int1d(Th,1) ( sigmaN(wx,wy,q)'*[uDx,uDy] )
+    - int1d(Th,1) ( alphatilde*(wx*uDx+wy*uDy)/h ) ;
 
 real tM = 1/(2*rho*sqrt(ax^2+ay^2)/h + 12*mu/h^2);
 
@@ -66,8 +65,8 @@ solve Oseen([ux,uy,p],[wx,wy,q],solver=LU)
     + PSPG
     + SUPG
     + lN
-    + on(1,4,3, ux=uDx, uy=uDy)
-    + on(5,6, ux=0, uy=0);
+    + on(1, ux=uDx, uy=uDy)
+    + on(3, ux=0, uy=0);
 
 real Reynold = (rho*sqrt(ax^2+ay^2)*1)/mu;
 

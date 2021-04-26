@@ -1,4 +1,4 @@
-filename = "cylinder3"
+filename = "cylinder1"
 
 # Modules import
 import gmsh
@@ -16,12 +16,12 @@ model.add("OseenCylinder")
 # Border parameters
 xlim = [-2, 6]
 ylim = [-3, 3]
-h_b = 0.05 # Mesh size on border
+h_b = 0.5 # Mesh size on border
 
 # Circle parameters
 center = [0, 0]
 radius = .5
-h_c = 0.05 # Mesh size on circle
+h_c = 0.5 # Mesh size on circle
 
 # ------------------------------- Create points
 points = [] # tags of the points 

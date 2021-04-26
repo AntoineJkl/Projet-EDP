@@ -22,6 +22,23 @@ def convert2D(filename):
                 f.write(tmp)
                 i+=1
 
+        elif "Edges" in line: # Change label of sides
+            nb = int(f0.readline())
+            f.write(f" {nb}\n")
+            
+            i=0
+            while(i<nb):
+                l = f0.readline().split()
+                if l[2] in ['1', '3', '4']:
+                    side = '1'
+                elif l[2] == '2':
+                    side = '2'
+                else:
+                    side = '3'
+                tmp = ' ' + l[0] + ' ' + l[1] + ' ' + side + '\n'
+                f.write(tmp)
+                i+=1
+
     # File closing
     f0.close()
     f.close()
