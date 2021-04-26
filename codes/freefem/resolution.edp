@@ -22,15 +22,56 @@ func uDy = 0;
     real rho = 1;
     //Viscosité du fluide
     real mu = 1;
+    real alphatilde = 1;
+    real h = 0.01;
 
-//Resolution
-//solve Oseen([ux,uy,p],[wx,wy,q],solver=LU) =
+macro grad(p) [dx(p), dy(p)] //
+macro Grad(u1, u2) [dx(u1),dy(u1), dx(u2),dy(u2)] //
+macro eps(u1, u2) [dx(u1),dy(u1)/2 + dx(u2)/2, dx(u2)/2 + dy(u1)/2 ,dy(u2)] //
+macro sigma(u1,u2,v) [-v , 0 , 0 , -v] + 2*mu*eps(u1,u2) //
+//macro sigmaN(u1,u2,v) [ sigma(u1,u2,v)[0]*N.x + sigma(u1,u2,v)[1]*N.y , sigma(u1,u2,v)[2]*N.x + sigma(u1,u2,v)[3]*N.y ] //
+macro Ugradv(u1, u2, v) ( u1*dx(v) + u2*dy(v) ) //
+macro UgradV(u1, u2, v1, v2) [u1*dx(v1) + u2*dx(v2), u1*dy(v1) + u2*dy(v2)] //
+macro div(u1, u2) ( dx(u1) + dy(u2) ) //
 
-//macro grad(ux,uy) [ [dx(ux),dy(ux)],[dx(uy),dy(uy)]] //
-//macro grad(u) [dx(u), dy(u)] //
+varf aG([ux,uy,p],[wx,wy,q]) 
+    = int2d(Th) ( rho*UgradV(ax, ay, ux, uy)' * [wx, wy] )
+    - int2d(Th) ( div(wx,wy)*p ) 
+    + int2d(Th) ( 2*mu*eps(wx,wy)'*eps(ux,uy) )
+    + int2d(Th) ( q*div(ux,uy) )
+    //rajouter dernier terme
+;
 
-matrix A =  [[1,1],[1,1]] ;
+varf aN([ux,uy,p],[wx,wy,q]) 
+    = //rajouter premier terme
+    int1d(Th,1) ( alphatilde*(wx*ux+wy*uy)/h );
 
-cout << A << endl;
+varf lN([ux,uy,p],[wx,wy,q]) 
+    = //rajouter premier terme
+    int1d(Th,1) ( -alphatilde*(wx*uDx+wy*uDy)/h ) ;
+
+real tM = 1/(2*rho*sqrt(ax^2+ay^2)/h + 12*mu/h^2);
+
+varf PSPG([ux,uy,p],[wx,wy,q]) 
+    = int2d(Th) ( tM*grad(q)'*( rho*UgradV(ax, ay, ux, uy) + grad(p) ) ); 
+
+varf SUPG([ux,uy,p],[wx,wy,q])
+    = int2d(Th) ( rho*UgradV(ax, ay, wx, wy)'*(tM*(UgradV(ax, ay, ux, uy) + grad(p) )) ) ; 
+
+solve Oseen([ux,uy,p],[wx,wy,q],solver=LU) 
+    = aG
+    + aN
+    + PSPG
+    + SUPG
+    + lN;
+
+plot(ux,fill=true);
+
+
+
+
+
+
+
 
 
