@@ -1,4 +1,4 @@
-filename = "wing_propeller"
+filename = "wing_ULM" #change file name corresponding to the .svg profil wanted
 
 # Modules import
 import svgpathtools
@@ -33,8 +33,8 @@ lines_b.append(model.geo.addLine(points_b[3], points_b[0]))
 
 border = model.geo.addCurveLoop(lines_b)
 
-model.addPhysicalGroup(1, lines_b[1:4:2], 1)
-model.addPhysicalGroup(1, lines_b[0:3:2], 2)
+model.addPhysicalGroup(1, [lines_b[0], lines_b[2], lines_b[3]], 1) # U-L-D borders
+model.addPhysicalGroup(1, [lines_b[1]], 2) # R borders
 
 # ------------------------------- CURVE BUILD
 r_factor = [1/100, -1/100] # (x,y) resizing factor (+ vertical flipping)

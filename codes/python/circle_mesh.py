@@ -16,12 +16,12 @@ model.add("OseenCylinder")
 # Border parameters
 xlim = [-2, 6]
 ylim = [-3, 3]
-h_b = 0.1 # Mesh size on border
+h_b = 0.5 # Mesh size on border
 
 # Circle parameters
 center = [0, 0]
-radius = .5
-h_c = 0.1 # Mesh size on circle
+radius = 1
+h_c = .5 # Mesh size on circle
 
 # ------------------------------- Create points
 points = [] # tags of the points 
@@ -39,10 +39,10 @@ points.append(model.geo.addPoint(center[0]+radius, center[1], 0, h_c))
 # ------------------------------- Create lines
 lines = [] # tags of the lines
 # border lines
-lines.append(model.geo.addLine(1, 2))
-lines.append(model.geo.addLine(2, 3))
-lines.append(model.geo.addLine(3, 4))
-lines.append(model.geo.addLine(4, 1))
+lines.append(model.geo.addLine(points[0], points[1]))
+lines.append(model.geo.addLine(points[1], points[2]))
+lines.append(model.geo.addLine(points[2], points[3]))
+lines.append(model.geo.addLine(points[3], points[0]))
 
 # circle lines
 lines.append(model.geo.addCircleArc(5, 6, 7))
@@ -56,14 +56,15 @@ circle = model.geo.addCurveLoop(lines[4:])
 surf = model.geo.addPlaneSurface([border, circle])
 
 # ------------------------------- Create Physical groups
-model.addPhysicalGroup(1, lines[1:4:2], 1) # L-R borders
-model.addPhysicalGroup(1, lines[0:3:2], 2) # U-P borders
-model.addPhysicalGroup(1, lines[4:], 3) # circle borders
+model.addPhysicalGroup(1, [lines[0], lines[2], lines[3]], 1) # U-L-D borders
+model.addPhysicalGroup(1, [lines[1]], 2) # R borders
+model.addPhysicalGroup(1, lines[4:], 3)  # circle borders
 
 model.addPhysicalGroup(2, [surf]) # surface
 
 # ------------------------------- Mesh build
 gmsh.model.geo.synchronize()
+
 model.mesh.generate(2) # Mesh(2D)
 
 # ------------------------------- File export

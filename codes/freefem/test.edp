@@ -1,2 +1,2 @@
-mesh Th = readmesh("mesh/cylinder.mesh");
+mesh Th = readmesh("mesh/cylinder2.mesh");
 plot(Th);
