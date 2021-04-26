@@ -1,4 +1,4 @@
-mesh Th = readmesh("codes/mesh/cylinder1.mesh");
+mesh Th = readmesh("codes/mesh/cylinder2.mesh");
 plot(Th);
 
 //Les espaces:
@@ -10,28 +10,28 @@ Vh ux , uy , wx , wy ;
 Sh p , q ;
 
 //Conditions:
-func uDx = 1;
+func uDx = 2;
 func uDy = 0;
 
 
 //Paramètres
     //Vitesse
-    real ax = 1;
+    real ax = 2;
     real ay = 0;
     //Densite du fluide
     real rho = 1;
     //Viscosité du fluide
     real mu = 1;
-    real alphatilde = 1;
-    real h = 0.01;
+    real alphatilde = 2;
+    real h = 0.2;
 
 macro grad(p) [dx(p), dy(p)] //
 macro Grad(u1, u2) [dx(u1),dy(u1), dx(u2),dy(u2)] //
 macro eps(u1, u2) [dx(u1),dy(u1)/2 + dx(u2)/2, dx(u2)/2 + dy(u1)/2 ,dy(u2)] //
 macro sigma(u1,u2,v) [-v , 0 , 0 , -v] + 2*mu*eps(u1,u2) //
-//macro sigmaN(u1,u2,v) [ sigma(u1,u2,v)[0]*N.x + sigma(u1,u2,v)[1]*N.y , sigma(u1,u2,v)[2]*N.x + sigma(u1,u2,v)[3]*N.y ] //
+macro sigmaN(u1,u2,v) [ (-v+2*mu*dx(u1))*N.x + mu*(dy(u1)+dx(u2))*N.y , mu*(dy(u1)+dx(u2))*N.x + (-v+2*mu*dy(u2))*N.y] //
 macro Ugradv(u1, u2, v) ( u1*dx(v) + u2*dy(v) ) //
-macro UgradV(u1, u2, v1, v2) [u1*dx(v1) + u2*dx(v2), u1*dy(v1) + u2*dy(v2)] //
+macro UgradV(u1, u2, v1, v2) [u1*dx(v1) + u2*dy(v1), u1*dx(v2) + u2*dy(v2)] //
 macro div(u1, u2) ( dx(u1) + dy(u2) ) //
 
 varf aG([ux,uy,p],[wx,wy,q]) 
@@ -39,16 +39,18 @@ varf aG([ux,uy,p],[wx,wy,q])
     - int2d(Th) ( div(wx,wy)*p ) 
     + int2d(Th) ( 2*mu*eps(wx,wy)'*eps(ux,uy) )
     + int2d(Th) ( q*div(ux,uy) )
-    //rajouter dernier terme
+    //warning
+    - int1d(Th,1,4,3) ( sigmaN(ux,uy,p)'*[wx,wy] )
 ;
 
 varf aN([ux,uy,p],[wx,wy,q]) 
-    = //rajouter premier terme
-    int1d(Th,1) ( alphatilde*(wx*ux+wy*uy)/h );
+    = int1d(Th,1,4,3) ( sigmaN(wx,wy,q)'*[ux,uy] )
+    + int1d(Th,1,4,3) ( alphatilde*(wx*ux+wy*uy)/h );
 
 varf lN([ux,uy,p],[wx,wy,q]) 
-    = //rajouter premier terme
-    int1d(Th,1) ( -alphatilde*(wx*uDx+wy*uDy)/h ) ;
+    //warning
+    = - int1d(Th,1,4,3) ( sigmaN(wx,wy,q)'*[uDx,uDy] )
+    - int1d(Th,1,4,3) ( alphatilde*(wx*uDx+wy*uDy)/h ) ;
 
 real tM = 1/(2*rho*sqrt(ax^2+ay^2)/h + 12*mu/h^2);
 
@@ -63,9 +65,20 @@ solve Oseen([ux,uy,p],[wx,wy,q],solver=LU)
     + aN
     + PSPG
     + SUPG
-    + lN;
+    + lN
+    + on(1,4,3, ux=uDx, uy=uDy)
+    + on(5,6, ux=0, uy=0);
 
-plot(ux,fill=true);
+real Reynold = (rho*sqrt(ax^2+ay^2)*1)/mu;
+
+Vh norm = sqrt(ux^2+uy^2);
+
+cout << "Nombre de Reynold : " << Reynold << endl;
+plot([ux, uy], wait=true,value=true,fill=true);
+plot(ux, wait=true,value=true,fill=true);
+plot(uy, wait=true,fill=true,value=true);
+plot(norm, wait=true,fill=true,value=true);
+plot(p,fill=true,value=true);
 
 
 
