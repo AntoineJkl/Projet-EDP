@@ -1,0 +1,36 @@
+mesh Th = readmesh("codes/mesh/cylinder1.mesh");
+plot(Th);
+
+//Les espaces:
+fespace Vh(Th,P1);
+fespace Sh(Th,P1);
+
+//Les variables:
+Vh ux , uy , wx , wy ;
+Sh p , q ;
+
+//Conditions:
+func uDx = 1;
+func uDy = 0;
+
+
+//Paramètres
+    //Vitesse
+    real ax = 1;
+    real ay = 0;
+    //Densite du fluide
+    real rho = 1;
+    //Viscosité du fluide
+    real mu = 1;
+
+//Resolution
+//solve Oseen([ux,uy,p],[wx,wy,q],solver=LU) =
+
+//macro grad(ux,uy) [ [dx(ux),dy(ux)],[dx(uy),dy(uy)]] //
+//macro grad(u) [dx(u), dy(u)] //
+
+matrix A =  [[1,1],[1,1]] ;
+
+cout << A << endl;
+
+
