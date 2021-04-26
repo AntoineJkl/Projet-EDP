@@ -1,4 +1,4 @@
-filename = "wing_blackbird" #change file name corresponding to the .svg profil wanted
+filename = "rabbit" #change file name corresponding to the .svg profil wanted
 
 # Modules import
 import svgpathtools
