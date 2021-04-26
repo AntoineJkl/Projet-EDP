@@ -1,4 +1,4 @@
-filename = "wing_ULM" #change file name corresponding to the .svg profil wanted
+filename = "sum" #change file name corresponding to the .svg profil wanted
 
 # Modules import
 import svgpathtools
@@ -12,8 +12,8 @@ from convertmesh import convert2D
 gmsh.initialize(sys.argv)
 model = gmsh.model
 model.add(filename)
-h_border = .5    # Mesh size of the border
-h_curve = 1   # Mesh size of the curve
+h_border = .1    # Mesh size of the border
+h_curve = .1   # Mesh size of the curve
 
 # ------------------------------- BORDER BUILD 
 xlim = [-2, 6]
@@ -37,8 +37,8 @@ model.addPhysicalGroup(1, [lines_b[0], lines_b[2], lines_b[3]], 1) # U-L-D borde
 model.addPhysicalGroup(1, [lines_b[1]], 2) # R borders
 
 # ------------------------------- CURVE BUILD
-r_factor = [1/100, -1/100] # (x,y) resizing factor (+ vertical flipping)
-t_factor = [0, 0] # (x,y) translation factor
+r_factor = [1/50, -1/50] # (x,y) resizing factor (+ vertical flipping)
+t_factor = [-50, -50] # (x,y) translation factor
 
 # .svg file reading
 mydoc = xml.dom.minidom.parse("profils/" + filename + ".svg")
@@ -57,8 +57,8 @@ points_c = [] # tags of curve points
 for p in points:
     points_c.append(
         model.geo.addPoint(
-            p.real * r_factor[0] + t_factor[0],
-            p.imag * r_factor[1] + t_factor[1],
+            (p.real + t_factor[0]) * r_factor[0],
+            (p.imag + t_factor[1]) * r_factor[1],
             0, h_curve)
         )
 

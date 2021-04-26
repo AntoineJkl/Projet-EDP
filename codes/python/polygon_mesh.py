@@ -1,4 +1,4 @@
-filename = "cylinder3"
+filename = "pentagon"
 
 # Modules import
 import gmsh
@@ -10,18 +10,20 @@ from convertmesh import convert2D
 # ------------------------------- Init GMSH
 gmsh.initialize(sys.argv)
 model = gmsh.model
-model.add("OseenCylinder")
+model.add("OseenPolygon")
 
 # ------------------------------- Parameters
 # Border parameters
 xlim = [-2, 6]
 ylim = [-3, 3]
-h_b = 0.05 # Mesh size on border
+h_b = .1 # Mesh size on border
 
-# Circle parameters
+# Polygon parameters
 center = [0, 0]
-radius = .5
-h_c = 0.05 # Mesh size on circle
+nb_sides = 5
+radius = math.sqrt(2)/2
+rotation = math.pi*0
+h_p = .1 # Mesh size on polygon
 
 # ------------------------------- Create points
 points = [] # tags of the points 
@@ -31,11 +33,14 @@ points.append(model.geo.addPoint(xlim[1], ylim[0], 0, h_b))
 points.append(model.geo.addPoint(xlim[1], ylim[1], 0, h_b))
 points.append(model.geo.addPoint(xlim[0], ylim[1], 0, h_b))
 
-# circle points
-points.append(model.geo.addPoint(center[0]-radius, center[1], 0, h_c))
-points.append(model.geo.addPoint(center[0],        center[1], 0, h_c))
-points.append(model.geo.addPoint(center[0]+radius, center[1], 0, h_c))
-
+# polygons points
+for i in range(nb_sides):
+    points.append(model.geo.addPoint(
+        center[0] + radius*math.cos(2*math.pi*i/nb_sides - rotation),
+        center[1] + radius*math.sin(2*math.pi*i/nb_sides - rotation),
+        0, h_p)
+    )
+    
 # ------------------------------- Create lines
 lines = [] # tags of the lines
 # border lines
@@ -44,9 +49,10 @@ lines.append(model.geo.addLine(points[1], points[2]))
 lines.append(model.geo.addLine(points[2], points[3]))
 lines.append(model.geo.addLine(points[3], points[0]))
 
-# circle lines
-lines.append(model.geo.addCircleArc(5, 6, 7))
-lines.append(model.geo.addCircleArc(7, 6, 5))
+# polygons lines
+for i in range(nb_sides-1):
+    lines.append(model.geo.addLine(points[4+i], points[5+i]))
+lines.append(model.geo.addLine(points[nb_sides+3], points[4]))
 
 # ------------------------------- Create CurveLoop
 border = model.geo.addCurveLoop(lines[:4])
