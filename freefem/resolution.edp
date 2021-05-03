@@ -61,6 +61,7 @@ real alpha = alphatilde/h;
     //Divergence vecteur U(u1,u2)
     macro div(u1, u2) ( dx(u1) + dy(u2) ) //
 
+//Terme de Galerkin
 varf aG([ux,uy,p],[wx,wy,q]) 
     = int2d(Th) ( rho*UgradV(ax, ay, ux, uy)' * [wx, wy] )
     - int2d(Th) ( div(wx,wy)*p ) 
