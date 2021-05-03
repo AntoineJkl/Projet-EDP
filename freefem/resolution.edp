@@ -1,83 +1,124 @@
-mesh Th = readmesh("mesh/cylinder1.mesh");
+verbosity = 0; //to remove all default output
+
+//Chargment de la mesh
+string forme = "mesh/" + ARGV[2] + ".mesh";
+mesh Th = readmesh(forme);
+
+//Récupération de la taille de la mesh
+string ligne;
+{
+    ifstream fichier(forme);
+
+    fichier >> ligne;
+    while(ligne.find("End")==-1){
+        fichier >> ligne;
+    }
+    fichier >> ligne;
+}
+
+//Affichage de la mesh
 plot(Th);
 
-//Les espaces:
+//Definition des espaces
 fespace Vh(Th,P1);
 fespace Sh(Th,P1);
 
-//Les variables:
+//Declaration des variables
 Vh ux , uy , wx , wy ;
 Sh p , q ;
 
-//Conditions:
-func uDx = 2;
+//Conditions de Dirichlet sur le bord 1
+func uDx = 10;
 func uDy = 0;
 
-//Paramètres
+//Paramètres de l'equation d'Osseen
     //Vitesse
-    real ax = 2;
+    real ax = 10;
     real ay = 0;
     //Densite du fluide
     real rho = 1;
     //Viscosité du fluide
     real mu = 1;
-    real alphatilde = 2;
-    real h = 0.2;
 
-macro grad(p) [dx(p), dy(p)] //
-macro Grad(u1, u2) [dx(u1),dy(u1), dx(u2),dy(u2)] //
-macro eps(u1, u2) [dx(u1),dy(u1)/2 + dx(u2)/2, dx(u2)/2 + dy(u1)/2 ,dy(u2)] //
-macro sigma(u1,u2,v) [-v , 0 , 0 , -v] + 2*mu*eps(u1,u2) //
-macro sigmaN(u1,u2,v) [ (-v+2*mu*dx(u1))*N.x + mu*(dy(u1)+dx(u2))*N.y , mu*(dy(u1)+dx(u2))*N.x + (-v+2*mu*dy(u2))*N.y] //
-macro Ugradv(u1, u2, v) ( u1*dx(v) + u2*dy(v) ) //
-macro UgradV(u1, u2, v1, v2) [u1*dx(v1) + u2*dy(v1), u1*dx(v2) + u2*dy(v2)] //
-macro div(u1, u2) ( dx(u1) + dy(u2) ) //
+//Taille du maillage
+real h = atof(ligne);
+
+cout << "h : " << h << endl;
+
+//Paramètre imposition de Nitsche
+real alphatilde = 1;
+real alpha = alphatilde/h;
+
+//Definition operateurs
+    //Gradient 1d de p
+    macro grad(p) [dx(p), dy(p)] //
+    //Tenseur de déformation du vecteur U(u1,u2)
+    macro eps(u1, u2) [dx(u1),dy(u1)/2 + dx(u2)/2, dx(u2)/2 + dy(u1)/2 ,dy(u2)] //
+    //Produit scalaire entre le tenseur des contraintes de U(u1,u2) et v avec la normale
+    macro sigmaN(u1,u2,v) [ (-v+2*mu*dx(u1))*N.x + mu*(dy(u1)+dx(u2))*N.y , mu*(dy(u1)+dx(u2))*N.x + (-v+2*mu*dy(u2))*N.y] //
+    //Produit scalaire entre vecteur U et Gradient vecteur p
+    macro UgradV(u1, u2, v1, v2) [u1*dx(v1) + u2*dy(v1), u1*dx(v2) + u2*dy(v2)] //
+    //Divergence vecteur U(u1,u2)
+    macro div(u1, u2) ( dx(u1) + dy(u2) ) //
 
 varf aG([ux,uy,p],[wx,wy,q]) 
     = int2d(Th) ( rho*UgradV(ax, ay, ux, uy)' * [wx, wy] )
     - int2d(Th) ( div(wx,wy)*p ) 
     + int2d(Th) ( 2*mu*eps(wx,wy)'*eps(ux,uy) )
     + int2d(Th) ( q*div(ux,uy) )
-    //warning
-    - int1d(Th,1) ( sigmaN(ux,uy,p)'*[wx,wy] )
-;
+    - int1d(Th,1,3) ( sigmaN(ux,uy,p)'*[wx,wy] ) ;
 
+//Imposition de Nitsche terme u
 varf aN([ux,uy,p],[wx,wy,q]) 
-    = int1d(Th,1) ( sigmaN(wx,wy,q)'*[ux,uy] )
-    + int1d(Th,1) ( alphatilde*(wx*ux+wy*uy)/h );
+    = int1d(Th,1,3) ( sigmaN(wx,wy,q)'*[ux,uy] )
+    + int1d(Th,1,3) ( alpha*(wx*ux+wy*uy) ) ;
 
+//Imposition de Nitsche terme uD
 varf lN([ux,uy,p],[wx,wy,q]) 
-    //warning
     = - int1d(Th,1) ( sigmaN(wx,wy,q)'*[uDx,uDy] )
-    - int1d(Th,1) ( alphatilde*(wx*uDx+wy*uDy)/h ) ;
+    - int1d(Th,1) ( alpha*(wx*uDx+wy*uDy) ) ;
 
+//Paramètre de stabilisation
 real tM = 1/(2*rho*sqrt(ax^2+ay^2)/h + 12*mu/h^2);
 
+//Stabilisation Pressure Streamline Petrov Galerkin
 varf PSPG([ux,uy,p],[wx,wy,q]) 
-    = int2d(Th) ( tM*grad(q)'*( rho*UgradV(ax, ay, ux, uy) + grad(p) ) ); 
+    = int2d(Th) ( tM*grad(q)'*( rho*UgradV(ax, ay, ux, uy) + grad(p) ) ) ; 
 
+//Stabilisation Streamline Upwind Petrov Galerkin
 varf SUPG([ux,uy,p],[wx,wy,q])
     = int2d(Th) ( rho*UgradV(ax, ay, wx, wy)'*(tM*(UgradV(ax, ay, ux, uy) + grad(p) )) ) ; 
 
+//Calcul et affichage du nombre de Reynold
+real Reynold = (rho*sqrt(ax^2+ay^2)*1)/mu;
+cout << "Nombre de Reynold : " << Reynold << endl;
+
+//Stockage du temps
+real cpu=clock();
+
+//Résolution des équation d'Oseen
+cout << "Resolution..." << endl;
 solve Oseen([ux,uy,p],[wx,wy,q],solver=LU) 
     = aG
     + aN
     + PSPG
     + SUPG
-    + lN
-    + on(1, ux=uDx, uy=uDy)
-    + on(3, ux=0, uy=0);
+    + lN ;
 
-real Reynold = (rho*sqrt(ax^2+ay^2)*1)/mu;
+// Affichage du temps de calcul
+cout << "Temps de calcul : " << (clock()-cpu) << "s." << endl;
 
+//Calcul de la norme de la vitesse
 Vh norm = sqrt(ux^2+uy^2);
 
-cout << "Nombre de Reynold : " << Reynold << endl;
+//Affichage solution
 plot([ux, uy], wait=true,value=true,fill=true);
 plot(ux, wait=true,value=true,fill=true);
 plot(uy, wait=true,fill=true,value=true);
 plot(norm, wait=true,fill=true,value=true);
 plot(p,fill=true,value=true);
+
+
 
 
 
