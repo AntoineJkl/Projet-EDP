@@ -1,2 +1,2 @@
-mesh Th = readmesh("mesh/triangle1.mesh");
+mesh Th = readmesh("mesh/rabbit.mesh");
 plot(Th,wait=1);

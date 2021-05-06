@@ -34,20 +34,20 @@ Dossier comportant :
 
 - les .mesh associés aux profils .svg et générés à partir du script *./python/svg_profile_mesh*.
 
-On renseigne ici les caractéristiques associées à chaque mesh généré
+On renseigne ici les caractéristiques associées à chaque mesh généré :
 
-| Fichier             | h | Lc | Description |
-|-------------------|---|----|-------------|
+| Fichier             | h  | Lc | Description |
+|---------------------|---:|---:|-------------|
 | cylinder1.mesh    | 0.5  |  1  | *Cylindre avec un grand pas h* |
 | cylinder2.mesh    | 0.2  |  1  | *Cylindre avec un pas h moyen* |
 | cylinder3.mesh    | 0.05 |  1  | *Cylindre avec un petit pas h* |
-| triangle1.mesh    | 0.1  |  1  | *Triangle pointant vers la droite* |
-| triangle2.mesh    | 0.1  |    | *Triangle pointant vers la gauche* |
-| square.mesh       | 0.1  |  1  | *Carré*      |
-| diamond.mesh      | 0.1  |    | *Losange*    |
-| pentagon.mesh     | 0.1  |    | *Pentagone*  |
-| rabbit.mesh       | 0.2  |    | *Lapin*  |
-| sum.mesh          | 0.2  |    | *Lettre sigma majuscule*  |
-|wing_propeller.mesh| 0.2  |    | *Hélice d'avion*  |
-| wing_ULM.mesh     | 0.2  |    | *Aile d'ULM*  |
-|wing_blackbird.mesh| 0.2  |    | *Aile de balckbird*  |
+| triangle1.mesh    | 0.1  |  1.225  | *Triangle pointant vers la droite* |
+| triangle2.mesh    | 0.1  |  1.225  | *Triangle pointant vers la gauche* |
+| square.mesh       | 0.1  |  1      | *Carré*      |
+| diamond.mesh      | 0.1  |  1.414  | *Losange*    |
+| pentagon.mesh     | 0.1  |  1.088  | *Pentagone*  |
+| rabbit.mesh       | 0.2  |  1      | *Lapin*  |
+| sum.mesh          | 0.2  |  0.850  | *Lettre sigma majuscule*  |
+|wing_propeller.mesh| 0.2  |  0.384  | *Hélice d'avion*  |
+| wing_ULM.mesh     | 0.2  |  0.323  | *Aile d'ULM*  |
+|wing_blackbird.mesh| 0.2  |  0.548  | *Aile de Blackbird*  |
