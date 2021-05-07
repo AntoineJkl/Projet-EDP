@@ -42,8 +42,12 @@ func uDy = 0;
 
 //Taille du maillage
 real h = atof(ligne);
+//Longueur caractéristique
+real Lc = 1;
 
 cout << "h : " << h << endl;
+cout << "Lc : " << Lc << endl;
+
 
 //Paramètre imposition de Nitsche
 real alphatilde = 1;
@@ -91,7 +95,7 @@ varf SUPG([ux,uy,p],[wx,wy,q])
     = int2d(Th) ( rho*UgradV(ax, ay, wx, wy)'*(tM*(UgradV(ax, ay, ux, uy) + grad(p) )) ) ; 
 
 //Calcul et affichage du nombre de Reynold
-real Reynold = (rho*sqrt(ax^2+ay^2)*1)/mu;
+real Reynold = (rho*sqrt(ax^2+ay^2)*Lc)/mu;
 cout << "Nombre de Reynold : " << Reynold << endl;
 
 //Stockage du temps
@@ -118,14 +122,3 @@ plot(ux, wait=true,value=true,fill=true);
 plot(uy, wait=true,fill=true,value=true);
 plot(norm, wait=true,fill=true,value=true);
 plot(p,fill=true,value=true);
-
-
-
-
-
-
-
-
-
-
-

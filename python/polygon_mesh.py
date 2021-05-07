@@ -1,4 +1,4 @@
-filename = "pentagon"
+filename = "square"
 
 # Modules import
 import gmsh
@@ -16,14 +16,14 @@ model.add("OseenPolygon")
 # Border parameters
 xlim = [-2, 6]
 ylim = [-3, 3]
-h_b = .1 # Mesh size on border
+h_b = .2 # Mesh size on border
 
 # Polygon parameters
 center = [0, 0]
-nb_sides = 5
+nb_sides = 4
 radius = math.sqrt(2)/2
-rotation = math.pi*0
-h_p = .1 # Mesh size on polygon
+rotation = math.pi/4
+h_p = .2 # Mesh size on polygon
 
 # ------------------------------- Create points
 points = [] # tags of the points 

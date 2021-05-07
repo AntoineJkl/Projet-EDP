@@ -1,2 +1,5 @@
-mesh Th = readmesh("mesh/rabbit.mesh");
+
+string forme = "mesh/" + ARGV[2] + ".mesh";
+mesh Th = readmesh(forme);
+
 plot(Th,wait=1);
