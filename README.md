@@ -1,9 +1,6 @@
 # Projet-EDP
 Ce projet porte sur la réalisation d'un schéma éléments finis pour le système d'équations d'Oseen
 
-Lien vers le rapport Overleaf:
-https://www.overleaf.com/5885633868mfbvhpmxmnkn
-
 - Répartition des tâches
     - Rédaction du rapport
     - Partie théorique
